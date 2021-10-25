@@ -8,6 +8,7 @@ Created on Mon Oct  4 10:24:22 2021
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # Constants and parameters
 g = 9.81 # [m/s^2]
 nu = 0.00109 # [N s/m^2], viscosity
@@ -29,7 +30,7 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_densities' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
 
 shapes = 4
 
