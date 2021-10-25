@@ -14,8 +14,10 @@ g = 9.81 # [m/s^2]
 
 # model settings
 dt = 60
-len_t = int(30*24*3600/dt)  # 30 days
+nr_days = 30
+len_t = int(nr_days*24*3600/dt)
 t = np.arange(0,len_t*dt, dt)
+drag = True
 
 D = 999 # [m], depth of grid
 dz = 1 # [m]
@@ -26,7 +28,7 @@ z = np.flip(z)
 nu = 0.00109 # [N s/m^2], viscosity
 rho_bf = 1388 # [kg/m^3], algae density
 rho_pl = 950 # [kg/m^3], plastic density
-rho_fo = 500 # [kg/m^3], plastic foam density
+rho_fo = 50 # [kg/m^3], plastic foam density
 
 m_A = 0.39/(3600*24) # [/s], mortality rate
 R_20 = 0.1/(3600*24) # [/s], respiration rate
@@ -36,29 +38,70 @@ V_A = 2*10**(-16) # [m^3], volume per algae
 
 # particle shapes
 theta_p = np.zeros(4)
-V_pl = np.zeros(4)
+d_s = np.zeros(4)
+d_n = np.zeros(4)
+length_ratio = np.zeros(4)
+A_p = np.zeros(4)
+C_d = np.zeros(4)
+axis_ratio = np.zeros(4)
+K = np.zeros(4)
 
 # sphere
 R_s = 0.001 # [m], radius of particle
 theta_p[0] = 4*np.pi*R_s**2 # [m^2], surface of particle
-V_pl[0] = 4/3*np.pi*R_s**3 # [m^3], plastic particle volume
+V_pl = 4/3*np.pi*R_s**3 # [m^3], plastic particle volume
+
+A_p[0] = np.pi*R_s**2
+C_d[0] = 0.47
+
+d_s[0] = 2*R_s
+d_n[0] = 2*R_s
+length_ratio[0] = (2*R_s)**2/(np.pi*R_s**2)
+axis_ratio[0] = 1
+K[0] = 0.357 + 0.684*(d_s[0]/d_n[0]) + 0.00154*length_ratio[0] + 0.0104*axis_ratio[0]
 
 # cilinder
-R_c = 0.001 # [m], radius
-L_c = 0.008 # [m], length of cilinder
+R_c = (V_pl/(np.pi*20))**(1/3) # [m], radius
+L_c = 20*R_c # [m], length of cilinder
 theta_p[1] = 2*np.pi*R_c*L_c + 2*np.pi*R_c**2
-V_pl[1] = np.pi*R_c**2*L_c
+
+A_p[1] = np.pi*R_c**2
+C_d[1] = 0.82
+
+d_s[1] = np.sqrt(2*(R_c*L_c+R_c**2))
+d_n[1] = 2*R_c
+length_ratio[1] = L_c**2/(np.pi*R_c**2)
+axis_ratio[1] = 1
+K[1] = 0.357 + 0.684*(d_s[1]/d_n[1]) + 0.00154*length_ratio[1] + 0.0104*axis_ratio[1]
 
 # film (square)
-L_fi = 0.005
-D_fi = 0.0001
-theta_p[2] = 2*L_fi**2
-V_pl[2] = L_fi**2*D_fi
+D_fi = (V_pl/100)**(1/3)
+L_fi = 10*D_fi
+theta_p[2] = 2*L_fi**2 + 4*L_fi*D_fi
+
+A_p[2] = L_fi**2
+C_d[2] = 1.28
+
+d_s[2] = 2*np.sqrt(1/(2*np.pi)*(L_fi**2+2*L_fi*D_fi))
+d_n[2] = 2*np.sqrt(L_fi**2/np.pi)
+length_ratio[2] = D_fi**2/(L_fi**2)
+axis_ratio[2] = 1
+K[2] = 0.357 + 0.684*(d_s[2]/d_n[2]) + 0.00154*length_ratio[2] + 0.0104*axis_ratio[2]
 
 # foam (sphere)
-R_fo = 0.001
+R_fo = R_s
 theta_p[3] = theta_p[0]
-V_pl[3] = V_pl[0]
+
+A_p[3] = np.pi*R_s**2
+C_d[3] = 0.47
+
+d_s[3] = d_s[0]
+d_n[3] = d_n[0]
+length_ratio[3] = length_ratio[0]
+axis_ratio[3] = axis_ratio[0]
+K[3] = K[0]
+
+K = K * d_n/(2*R_s)
 
 # Temperature profile
 T_surf = 25     # Water temperature at the surface [degrees Celcius], for the North Pacific
@@ -141,13 +184,13 @@ V_bf = np.zeros((len_t,len(theta_p)))
 V_p = np.zeros((len_t,len(theta_p)))
 
 # initial conditions
-V_bf[0,:] = V_pl[:]/10
+V_bf[0,:] = V_pl/10
 A[0,:] = V_bf[0,:]/(V_A*theta_p[:])
-V_p[0,:] = V_bf[0,:] + V_pl[:]
+V_p[0,:] = V_bf[0,:] + V_pl
 w[0,:] = 0
 z_p[0,:] = 0
-rho_p[0,:] = (V_bf[0,:]*rho_bf + V_pl[:]*rho_pl)/(V_p[0,:])
-rho_p[0,3] = (V_bf[0,3]*rho_bf + V_pl[3]*rho_fo)/(V_p[0,3]) # foam 
+rho_p[0,:] = (V_bf[0,:]*rho_bf + V_pl*rho_pl)/(V_p[0,:])
+rho_p[0,3] = (V_bf[0,3]*rho_bf + V_pl*rho_fo)/(V_p[0,3]) # foam 
 
 # integrate
 for j in range(len(theta_p)):
@@ -158,25 +201,20 @@ for j in range(len(theta_p)):
         A[i+1,j] = A[i,j] + dAdt*dt
         
         V_bf[i+1,j] = V_A*A[i+1,j]*theta_p[j]
-        V_p[i+1,j] = V_bf[i+1,j] + V_pl[j]
+        V_p[i+1,j] = V_bf[i+1,j] + V_pl
         
-        if j==0: #sphere
-            R_p = (V_p[i+1,j]*(3/4)/np.pi)**(1/3)
-            rho_p[i+1,j] = (V_bf[i+1,j]*rho_bf + V_pl[j]*rho_pl)/(V_p[i+1,j])
-        elif j==1: #cilinder
-            R_p = (V_p[i+1,j]*(3/4)/np.pi)**(1/3) ## CHANGE
-            rho_p[i+1,j] = (V_bf[i+1,j]*rho_bf + V_pl[j]*rho_pl)/(V_p[i+1,j])
-        elif j==2: #film
-            R_p = (V_p[i+1,j]*(3/4)/np.pi)**(1/3) ## CHANGE
-            rho_p[i+1,j] = (V_bf[i+1,j]*rho_bf + V_pl[j]*rho_pl)/(V_p[i+1,j])
-        elif j==3: #foam
-            R_p = (V_p[i+1,j]*(3/4)/np.pi)**(1/3) ## CHANGE
-            rho_p[i+1,j] = (V_bf[i+1,j]*rho_bf + V_pl[j]*rho_fo)/(V_p[i+1,j])
+        if j==3: #foam
+            rho_p[i+1,j] = (V_bf[i+1,j]*rho_bf + V_pl*rho_fo)/(V_p[i+1,j])        
+        else:
+            rho_p[i+1,j] = (V_bf[i+1,j]*rho_bf + V_pl*rho_pl)/(V_p[i+1,j])
         
+        R_p = (V_p[i+1,j]*(3/4)/np.pi)**(1/3) # equivalent sphere radius
         
-        F_d = np.sign(w[i,j]) * 6*np.pi*R_p*nu*w[i,j]
-        
-        w[i+1,j] = -(2/9)*(rho_p[i+1,j]-rho_sw[index_p])/nu*g*R_p**2 # terminal velocity (Fg, Fb, Fd)
+        # w[i+1,j] = -np.sign(rho_p[i+1,j]-rho_sw[index_p])*np.sqrt(abs(V_p[i+1,j]*(rho_p[i+1,j]-rho_sw[index_p])*g/(0.5*rho_sw[index_p]*C_d[j]*A_p[j])))
+        if drag == True:
+           w[i+1,j] = -(2/9)*(rho_p[i+1,j]-rho_sw[index_p])/(nu*K[j])*g*R_p**2 # terminal velocity (Fg, Fb, Fd)
+        else:
+            w[i+1,j] = -(2/9)*(rho_p[i+1,j]-rho_sw[index_p])/(nu)*g*R_p**2 # terminal velocity (Fg, Fb, Fd)
         
         z_p[i+1,j] = z_p[i,j] + w[i+1,j]*dt
         
@@ -223,24 +261,68 @@ plt.title('Density profile of the North-Pacific ocean')
 plt.savefig("density_NP.png")
 plt.show()
 
+#%%
 ## Particle depth
 plt.figure(figsize=(8,6))
 plt.plot(t/(3600*24), z_p[:,0], label='sphere')
-plt.plot(t/(3600*24), z_p[:,1], label='cilinder')
+plt.xlim([25,30])
+plt.xlabel('time (days)')
+plt.ylabel('depth [m]')
+plt.legend()
+plt.title('Plastic particle oscillation, shape-dependant drag = '+ str(drag))
+plt.savefig("part_dep.png")
+plt.show()
+
+plt.figure(figsize=(8,6))
+plt.plot(t/(3600*24), z_p[:,1], label='cylinder')
+plt.xlim([25,30])
+plt.xlabel('time (days)')
+plt.ylabel('depth [m]')
+plt.legend()
+plt.title('Plastic particle oscillation, shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+plt.savefig("part_dep.png")
+plt.show()
+
+plt.figure(figsize=(8,6))
+plt.plot(t/(3600*24), z_p[:,2], label='film')
+plt.xlim([25,30])
+plt.xlabel('time (days)')
+plt.ylabel('depth [m]')
+plt.legend()
+plt.title('Plastic particle oscillation, shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+plt.savefig("part_dep.png")
+plt.show()
+
+plt.figure(figsize=(8,6))
+plt.plot(t/(3600*24), z_p[:,3], label='foam')
+plt.xlim([25,30])
+plt.xlabel('time (days)')
+plt.ylabel('depth [m]')
+plt.legend()
+plt.title('Plastic particle oscillation, shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+plt.savefig("part_dep.png")
+plt.show()
+
+#%%
+## Particle depth
+plt.figure(figsize=(8,6))
+plt.plot(t/(3600*24), z_p[:,0], label='sphere')
+plt.plot(t/(3600*24), z_p[:,1], label='cylinder')
 plt.plot(t/(3600*24), z_p[:,2], label='film')
 plt.plot(t/(3600*24), z_p[:,3], label='foam')
 plt.xlim([25,30])
 plt.xlabel('time (days)')
 plt.ylabel('depth [m]')
 plt.legend()
-plt.title('Plastic particle oscillation') #', R = '+ str(R) + ' m')
+plt.title('Plastic particle oscillation, shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
 plt.savefig("part_dep.png")
 plt.show()
+#%%
 
 ## Particle density
 plt.figure(figsize=(8,6))
 plt.plot(t/(3600*24), rho_p[:,0], label='sphere')
-plt.plot(t/(3600*24), rho_p[:,1], label='cilinder')
+plt.plot(t/(3600*24), rho_p[:,1], label='cylinder')
 plt.plot(t/(3600*24), rho_p[:,2], label='film')
 plt.plot(t/(3600*24), rho_p[:,3], label='foam')
 plt.xlim([25,30])
@@ -255,7 +337,7 @@ plt.show()
 ## Particle velocity
 plt.figure(figsize=(8,6))
 plt.plot(t/(3600*24), w[:,0], label='sphere')
-plt.plot(t/(3600*24), w[:,1], label='cilinder')
+plt.plot(t/(3600*24), w[:,1], label='cylinder')
 plt.plot(t/(3600*24), w[:,2], label='film')
 plt.plot(t/(3600*24), w[:,3], label='foam')
 plt.xlim([25,30])
