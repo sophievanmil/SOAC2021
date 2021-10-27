@@ -339,40 +339,45 @@ plt.show()
 # plt.savefig("part_vel.png")
 # plt.show()
 
-# ## Surface light fluctuation
-# plt.figure(figsize=(8,6))
-# plt.plot(t/(3600*24), I_fluc)
-# plt.xlim([25,30])
-# plt.ylabel('Light intensity [$\mu E /(m^{2}s)$]')
-# plt.xlabel('time [days]')
-# plt.title('Light intensity cycle at the surface (z=0)')
-# plt.savefig("surfacelight.png")
-# plt.show()
+#%%
 
-# # Seawater temperature
-# plt.figure(figsize=(8,6))
-# plt.plot(T, z)
-# plt.xlabel('temperature [$\degree$ C]')
-# plt.ylabel('depth [m]')
-# plt.title('Temperature profile of the North-Pacific ocean')
-# plt.savefig("temp_NP.png")
-# plt.show()
+## Seawater light fluctuation
+plt.figure(figsize=(8,6))
+plt.contourf(t/(3600*24),z,np.transpose(I))
+plt.xlim([25,30])
+plt.ylim([-20,0])
+plt.xlabel('Time [days]')
+plt.ylabel('Depth [m]')
+plt.colorbar(label='Light intensity [$\mu E /(m^{2}s)$]')
+plt.title('Light penetration')
+plt.savefig("sealight.png")
+plt.show()
 
-# # Seawater salinity
-# plt.figure(figsize=(8,6))
-# plt.plot(S*1000, z)
-# plt.xlabel('salinity [g/kg]')
-# plt.ylabel('depth [m]')
-# plt.title('Salinity profile of the North-Pacific ocean')
-# plt.savefig("salinity_NP.png")
-# plt.show()
+# Seawater temperature
+plt.figure(figsize=(8,6))
+plt.plot(T, z, 'r')
+plt.xlabel('Temperature [$\degree$ C]')
+plt.ylabel('Depth [m]')
+plt.title('Temperature profile of the North-Pacific ocean')
+plt.savefig("temp_NP.png")
+plt.show()
+
+# Seawater salinity
+plt.figure(figsize=(8,6))
+plt.plot(S*1000, z, color='grey')
+plt.xlabel('Salinity [g/kg]')
+plt.ylabel('Depth [m]')
+plt.title('Salinity profile of the North-Pacific ocean')
+plt.savefig("salinity_NP.png")
+plt.show()
   		
-# # Seawater density
-# plt.figure(figsize=(8,6))
-# plt.plot(rho_sw, z)
-# plt.xlabel('seawater density [kg/m^3]')
-# plt.ylabel('depth [m]')
-# plt.title('Density profile of the North-Pacific ocean')
-# plt.savefig("density_NP.png")
-# plt.show()
+# Seawater density
+plt.figure(figsize=(8,6))
+plt.plot(rho_sw, z, color='navy')
+plt.xlabel('Seawater density [$kg/m^3$]')
+plt.ylabel('Depth [m]')
+plt.title('Density profile of the North-Pacific ocean')
+plt.savefig("density_NP.png")
+plt.show()
+
 
