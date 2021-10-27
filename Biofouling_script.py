@@ -8,6 +8,7 @@ Created on Mon Oct  4 10:24:22 2021
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # Constants and parameters
 g = 9.81 # [m/s^2]
 nu = 0.00109 # [N s/m^2], viscosity
@@ -28,8 +29,8 @@ dz = 1 # [m]
 z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
-drag = True
-vary = 'vary_densities' # vary_shapes or vary_densities or vary_sizes
+drag = False
+vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 
 shapes = 4
 
@@ -66,8 +67,8 @@ if vary == 'vary_shapes':
     K[0] = 0.357 + 0.684*(d_s[0]/d_n[0]) + 0.00154*length_ratio[0] + 0.0104*axis_ratio[0]
     
     # cylinder falling vertically
-    R_c = (V_pl/(np.pi*20))**(1/3) # [m], radius
-    L_c = 20*R_c # [m], length of cylinder
+    R_c = (V_pl/(np.pi*200))**(1/3) # [m], radius
+    L_c = 200*R_c # [m], length of cylinder
     theta_p[1] = 2*np.pi*R_c*L_c + 2*np.pi*R_c**2
     
     d_s[1] = np.sqrt(2*(R_c*L_c+R_c**2))
@@ -77,8 +78,8 @@ if vary == 'vary_shapes':
     K[1] = 0.357 + 0.684*(d_s[1]/d_n[1]) + 0.00154*length_ratio[1] + 0.0104*axis_ratio[1]
     
     # cylinder falling horizontally
-    R_c = (V_pl/(np.pi*20))**(1/3) # [m], radius
-    L_c = 20*R_c # [m], length of cylinder
+    R_c = (V_pl/(np.pi*200))**(1/3) # [m], radius
+    L_c = 200*R_c # [m], length of cylinder
     theta_p[2] = 2*np.pi*R_c*L_c + 2*np.pi*R_c**2
     
     d_s[2] = d_s[1] # np.sqrt(2*(R_c*L_c+R_c**2))
@@ -88,8 +89,8 @@ if vary == 'vary_shapes':
     K[2] = 0.357 + 0.684*(d_s[2]/d_n[2]) + 0.00154*length_ratio[2] + 0.0104*axis_ratio[2]
     
     # film (square)
-    D_fi = (V_pl/100)**(1/3)
-    L_fi = 10*D_fi
+    D_fi = (V_pl/10000)**(1/3)
+    L_fi = 100*D_fi
     theta_p[3] = 2*L_fi**2 + 4*L_fi*D_fi
     
     d_s[3] = 2*np.sqrt(1/(2*np.pi)*(L_fi**2+2*L_fi*D_fi))
@@ -178,8 +179,11 @@ V_bf = np.zeros((len_t,length))
 V_p = np.zeros((len_t,length))
 
 # initial conditions
-V_bf[0,:] = V_pl/10
-A[0,:] = V_bf[0,:]/(V_A*theta_p[:])
+V_bf[0,0] = V_pl/100
+A[0,0] = V_bf[0,0]/(V_A*theta_p[0])
+A[0,:] = A[0,0]
+V_bf[0,:] = V_A*A[0,:]*theta_p[:]
+
 V_p[0,:] = V_bf[0,:] + V_pl
 w[0,:] = 0
 z_p[0,:] = 0
@@ -220,8 +224,24 @@ for j in range(length):
 
 #%% Figures
 
+if vary == 'vary_shapes' and drag == False:
+    plt.figure(figsize=(8,6)) 
+    plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere')
+    # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
+    plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally')
+    plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_4[1], label='Film')
+    # plt.xlim([0,24])
+    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+    plt.xlabel('Time [hours]')
+    plt.ylabel('Depth [m]')
+    plt.legend()
+    plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    plt.savefig("part_dep_shapes_constantdrag.png")
+    plt.show()
+ # TO DO: PLOTJE MET GEDEELDE X-AS en zonkracht   
+#%%
 ## Particle depth
-if vary == 'vary_shapes':
+if vary == 'vary_shapes' and drag == True:
     plt.figure(figsize=(8,6)) 
     plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere, K = {0:1.5f}'.format(K[0]))
     plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically, K = {0:1.5f}'.format(K[1]))
@@ -276,46 +296,52 @@ if vary == 'vary_sizes':
 
 ## Particle density
 plt.figure(figsize=(8,6))
-plt.plot(t/(3600*24), rho_p[:,0], label='sphere')
-plt.plot(t/(3600*24), rho_p[:,1], label='cylinder')
-plt.plot(t/(3600*24), rho_p[:,2], label='film')
-plt.plot(t/(3600*24), rho_p[:,3], label='foam')
-plt.xlim([25,30])
-plt.ylim([950,np.max(rho_p)+10])
+plt.plot(t/(3600*24), V_bf[:,0], label='sphere')
+plt.plot(t/(3600*24), V_bf[:,1], label='cylinder')
+plt.plot(t/(3600*24), V_bf[:,2], label='cylinder')
+plt.plot(t/(3600*24), V_bf[:,3], label='film')
+# plt.plot(t/(3600*24), rho_p[:,3], label='foam')
+# plt.xlim([25,30])
+# plt.ylim([950,np.max(rho_p)+10])
 plt.xlabel('time (days)')
-plt.ylabel('density [$kg/m^{3}]$')
+plt.ylabel('Biofilm volume [$kg/m^{3}]$')
 plt.legend()
 plt.title('Plastic particle density during oscillation')
 plt.savefig("part_dens.png")
 plt.show()
 
-## Particle velocity
+## Particle density
 plt.figure(figsize=(8,6))
-plt.plot(t/(3600*24), w[:,0], label='sphere')
-plt.plot(t/(3600*24), w[:,1], label='cylinder')
-plt.plot(t/(3600*24), w[:,2], label='film')
-plt.plot(t/(3600*24), w[:,3], label='foam')
-plt.xlim([25,30])
-plt.xlabel('time (days)')
-plt.ylabel('velocity [m/s]')
-plt.legend()
-plt.title('Plastic particle velocity during oscillation')
-plt.savefig("part_vel.png")
-plt.show()
-
-
-#%%
-## Surface light fluctuation
-# plt.figure(figsize=(8,6))
-# plt.rcParams['font.size']='14'
-# plt.plot(t/(3600*24), I_fluc)
+plt.plot(t/(3600*24), A[:,0], label='sphere')
+plt.plot(t/(3600*24), A[:,1], label='cylinder')
+# plt.plot(t/(3600*24), V_bf[:,2], label='cylinder')
+plt.plot(t/(3600*24), A[:,3], label='film')
+# plt.plot(t/(3600*24), rho_p[:,3], label='foam')
 # plt.xlim([25,30])
-# plt.ylabel('Light intensity [$\mu E /(m^{2}s)$]')
-# plt.xlabel('Time [days]')
-# plt.title('Light intensity cycle at the surface (z=0)')
-# plt.savefig("surfacelight.png")
+# plt.ylim([950,np.max(rho_p)+10])
+plt.xlabel('time (days)')
+plt.ylabel('A ')
+plt.legend()
+plt.title('Plastic particle density during oscillation')
+plt.savefig("part_dens.png")
+plt.show()
+# ## Particle velocity
+# plt.figure(figsize=(8,6))
+# plt.plot(t/(3600*24), w[:,0], label='sphere')
+# plt.plot(t/(3600*24), w[:,1], label='cylinder')
+# plt.plot(t/(3600*24), w[:,2], label='film')
+# plt.plot(t/(3600*24), w[:,3], label='foam')
+# plt.xlim([25,30])
+# plt.xlabel('time (days)')
+# plt.ylabel('velocity [m/s]')
+# plt.legend()
+# plt.title('Plastic particle velocity during oscillation')
+# plt.savefig("part_vel.png")
 # plt.show()
 
+#%%
+
+## Seawater light fluctuation
 plt.figure(figsize=(8,6))
 plt.contourf(t/(3600*24),z,np.transpose(I))
 plt.xlim([25,30])
@@ -353,4 +379,5 @@ plt.ylabel('Depth [m]')
 plt.title('Density profile of the North-Pacific ocean')
 plt.savefig("density_NP.png")
 plt.show()
+
 
