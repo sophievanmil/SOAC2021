@@ -7,8 +7,9 @@ Created on Mon Oct  4 10:24:22 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
 
-# saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
+#saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
 saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
 # Constants and parameters
@@ -32,18 +33,38 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_densities' # vary_shapes or vary_densities or vary_sizes
+many_densities = False
+many_sizes = False
 
 shapes = 4
 
 rho_pl = np.array([50, 500, 950, 1020])
+if vary == 'vary_densities' and many_densities == True:
+    rho_pl = np.array([50, 280, 285, 870, 875, 1020])
+
 densities = len(rho_pl)
 
-radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
+#radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
+radius = np.linspace(0.0001,0.02, 100) #m
+if vary == 'vary_sizes' and many_sizes == True:
+    radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
+    
 sizes = len(radius)
 
 # Plotting
-colors_4 = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+# colors_4 = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e'] 
+MEDIUM_SIZE = 13
+BIGGER_SIZE = 16
+
+plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=BIGGER_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 #%% VARY SHAPES/DENSITY/RADIUS
 
@@ -154,10 +175,13 @@ elif vary == 'vary_sizes':
 # define matrices
 w = np.zeros((len_t,length))
 z_p = np.zeros((len_t,length))
+z_25 = z_p[int(25*24*3600/dt):int(26*24*3600/dt),:]
 rho_p = np.zeros((len_t,length))
 A = np.zeros((len_t,length))
 V_bf = np.zeros((len_t,length))
 V_p = np.zeros((len_t,length))
+nr_peaks = np.zeros(length)
+
 
 # initial conditions
 V_bf[0,0] = V_pl[0]/100
@@ -202,99 +226,129 @@ for j in range(length):
         if z_p[i+1,j] >= 0: # particle is at surface
             z_p[i+1,j] = 0
             w[i+1,j] = 0
-
- 
+            
+    z_25[:,j] = z_p[int(25*24*3600/dt):int(26*24*3600/dt),j]
+    
+    nr_peaks[j] = len(find_peaks(-z_25[:,j])[0])
+    
 #%%
 ## Particle depth
-if vary == 'vary_shapes' and drag == True:
+
+if vary == 'vary_shapes' and drag == True:  
     plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600)-(25*24), z_p[:,0], color = colors_4[3], label='Sphere, K = {0:1.5f}'.format(K[0]))
-    plt.plot(t/(3600)-(25*24), z_p[:,1], color = colors_4[2], label='Cylinder falling vertically, K = {0:1.5f}'.format(K[1]))
-    plt.plot(t/(3600)-(25*24), z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally, K = {0:1.5f}'.format(K[2]))
-    plt.plot(t/(3600)-(25*24), z_p[:,3], color = colors_4[1], label='Film, K = {0:1.5f}'.format(K[3]))
+    plt.plot(t/(3600)-(25*24), z_p[:,0], color = colors_shapes[0], label='Sphere, K = {0:1.5f}'.format(K[0]))
+    plt.plot(t/(3600)-(25*24), z_p[:,1], color = colors_shapes[1], label='Cylinder falling vertically, K = {0:1.5f}'.format(K[1]))
+    plt.plot(t/(3600)-(25*24), z_p[:,2], color = colors_shapes[2], label='Cylinder falling horizontally, K = {0:1.5f}'.format(K[2]))
+    plt.plot(t/(3600)-(25*24), z_p[:,3], color = colors_shapes[3], label='Film, K = {0:1.5f}'.format(K[3]))
     plt.xlim([0,48])
     plt.xticks(np.arange(0,54,6))
     plt.xlabel('Time [hours]')
     plt.ylabel('Depth [m]')
     plt.legend()
-    plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    #plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
     plt.savefig(saveloc+"shapes_dep.png")
     plt.show()
     
     ## Biofilm volume
     plt.figure(figsize=(8,6))
-    plt.plot(t/(3600*24), V_bf[:,0], color = colors_4[3], label='Sphere')
-    plt.plot(t/(3600*24), V_bf[:,1], color = colors_4[2], label='Cylinder falling vertically')
-    plt.plot(t/(3600*24), V_bf[:,2], color = colors_4[0], label='Cylinder falling horizontally')
-    plt.plot(t/(3600*24), V_bf[:,3], color = colors_4[1], label='Film')
-    plt.xlabel('time (days)')
+    plt.plot(t/(3600*24), V_bf[:,0], color = colors_shapes[0], label='Sphere')
+    plt.plot(t/(3600*24), V_bf[:,1], color = colors_shapes[1], label='Cylinder falling vertically')
+    plt.plot(t/(3600*24), V_bf[:,2], color = colors_shapes[2], label='Cylinder falling horizontally')
+    plt.plot(t/(3600*24), V_bf[:,3], color = colors_shapes[3], label='Film')
+    plt.xlabel('Time [days]')
     plt.ylabel('Biofilm volume [m$^{3}]$')
     plt.legend()
-    plt.title('Effect of shape on oscillation - Biofilm volume')
+    #plt.title('Effect of shape on biofilm volume')
     plt.savefig(saveloc+"shapes_bf.png")
     plt.show()
     
     ## Algae per m^2
     plt.figure(figsize=(8,6))
-    plt.plot(t/(3600*24), A[:,0], color = colors_4[3], label='Sphere')
-    plt.plot(t/(3600*24), A[:,1], color = colors_4[2], label='Cylinder falling vertically')
-    plt.plot(t/(3600*24), A[:,2], color = colors_4[0], label='Cylinder falling horizontally')
-    plt.plot(t/(3600*24), A[:,3], color = colors_4[1], label='Film')
-    plt.xlabel('time (days)')
+    plt.plot(t/(3600*24), A[:,0], color = colors_shapes[0], label='Sphere')
+    plt.plot(t/(3600*24), A[:,1], color = colors_shapes[1], label='Cylinder falling vertically')
+    plt.plot(t/(3600*24), A[:,2], color = colors_shapes[2], label='Cylinder falling horizontally')
+    plt.plot(t/(3600*24), A[:,3], color = colors_shapes[3], label='Film')
+    plt.xlabel('Time [days]')
     plt.ylabel('A [Nr algae /m$^2$] ')
     plt.legend()
-    plt.title('Effect of shape on oscillation - Algae thickness')
+    #plt.title('Effect of shape on algae thickness')
     plt.savefig(saveloc+"shapes_A.png")
     plt.show()
+    
+    w_max = np.max(w, axis=0)
+    z_max = np.min(z_25, axis=0)
 
 if vary == 'vary_densities':
-    plt.figure(figsize=(8,6)) 
-    for i in range(densities):
-        plt.plot(t/(3600)-(24*25), z_p[:,i], label='Density = {} kg/m$^3$'.format(rho_pl[i]))
-    plt.xlim([0,24])
-    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
-    plt.xlabel('Time [hours]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for spheres of various densities, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"densities_dep.png")
-    plt.show()
-    
-    plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600*24), z_p[:,-1], 'r', label='Density = {} kg/m$^3$'.format(rho_pl[-1]))
-    plt.xlim([0,20])
-    plt.xlabel('Time [days]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"densities_long.png")
-    plt.show()
+    if many_densities == False:
+        plt.figure(figsize=(8,6)) 
+        for i in np.arange(0,len(rho_pl),1):
+            plt.plot(t/(3600)-(24*25), z_p[:,i], label='Density = {} kg/m$^3$'.format(rho_pl[i]))
+        plt.xlim([0,24])
+        plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+        plt.xlabel('Time [hours]')
+        plt.ylabel('Depth [m]')
+        plt.legend()
+        #plt.title('Plastic particle oscillation for spheres of various densities, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+        plt.savefig(saveloc+"densities_dep.png")
+        plt.show()
+        
+        plt.figure(figsize=(8,6)) 
+        plt.plot(t/(3600*24), z_p[:,-1], 'r', label='Density = {} kg/m$^3$'.format(rho_pl[-1]))
+        plt.xlim([0,20])
+        plt.xlabel('Time [days]')
+        plt.ylabel('Depth [m]')
+        plt.legend()
+        #plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+        plt.savefig(saveloc+"densities_long.png")
+        # plt.show()
+        
+    if many_densities == True:
+        # FIND AMOUNT OF OSCILLATIONS
+        plt.figure(figsize=(8,6)) 
+        plt.plot(rho_pl, nr_peaks)
+        plt.xlabel('Plastic density [kg/m$^3$]')
+        plt.yticks([0, int(1), int(2), int(3)])
+        plt.ylabel('Nr oscillations')
+        # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+        plt.savefig(saveloc+"densities_osc.png")
+        plt.show()
 
 if vary == 'vary_sizes':
-    plt.figure(figsize=(8,6)) 
-    for i in range(sizes):
-        plt.plot(t/(3600)-25*24, z_p[:,i], label='Radius = {} mm'.format(R_s[i]*1000))
-    plt.xlim([0, 24])
-    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
-    plt.xlabel('Time [hours]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for spheres of various sizes, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"sizes_dep.png")
-    plt.show()
-    
-    # Plot of smallest size (0.1 mm), for total time interval
-    plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600*24), z_p[:,0], label='Radius = {} mm'.format(R_s[0]*1000))
-    plt.xlabel('Time [days]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for smallest sphere') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"sizes_small.png")
-    plt.show()
-    
-    print('max velocities: ', np.max(w, axis=0))
-    
+     if many_sizes == False:
+         plt.figure(figsize=(8,6)) 
+         for i in range(sizes):
+             plt.plot(t/(3600)-25*24, z_p[:,i], label='Radius = {} mm'.format(R_s[i]*1000))
+         plt.xlim([0, 24])
+         plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+         plt.xlabel('Time [hours]')
+         plt.ylabel('Depth [m]')
+         plt.legend()
+        # plt.title('Plastic particle oscillation for spheres of various sizes, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+         plt.savefig(saveloc+"sizes_dep.png")
+         plt.show()
+        
+         # Plot of smallest size (0.1 mm), for total time interval
+         plt.figure(figsize=(8,6)) 
+         plt.plot(t/(3600*24), z_p[:,0], label='Radius = {} mm'.format(R_s[0]*1000))
+         plt.xlabel('Time [days]')
+         plt.ylabel('Depth [m]')
+         plt.legend()
+         #plt.title('Plastic particle oscillation for smallest sphere') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+         plt.savefig(saveloc+"sizes_small.png")
+         plt.show()
+         
+     if many_sizes == True:
+        # max velocity vs size
+        w_max = np.max(w, axis=0)
+        
+        plt.figure(figsize=(8,6)) 
+        plt.plot(radius*1000, w_max, '.')
+        # plt.xlim([0,20])
+        plt.xlabel('Particle radius [mm]')
+        plt.ylabel('Max velocity [m/s]')
+        # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+        plt.savefig(saveloc+"max_vel.png")
+        plt.show()
 
 #%% Profiles
 
@@ -305,8 +359,8 @@ plt.xlim([25,30])
 plt.ylim([-20,0])
 plt.xlabel('Time [days]')
 plt.ylabel('Depth [m]')
-plt.colorbar(label='Light intensity [$\mu E /(m^{2}s)$]')
-plt.title('Light penetration')
+plt.colorbar(label='Light intensity [$\mu$ E /(m$^{2}$s)]')
+#plt.title('Light penetration')
 plt.savefig(saveloc+"sealight.png")
 plt.show()
 
@@ -315,7 +369,7 @@ plt.figure(figsize=(8,6))
 plt.plot(T, z, 'r')
 plt.xlabel('Temperature [$\degree$ C]')
 plt.ylabel('Depth [m]')
-plt.title('Temperature profile of the North-Pacific ocean')
+#plt.title('Temperature profile of the North-Pacific ocean')
 plt.savefig(saveloc+"temp_NP.png")
 plt.show()
 
@@ -324,16 +378,16 @@ plt.figure(figsize=(8,6))
 plt.plot(S*1000, z, color='grey')
 plt.xlabel('Salinity [g/kg]')
 plt.ylabel('Depth [m]')
-plt.title('Salinity profile of the North-Pacific ocean')
+#plt.title('Salinity profile of the North-Pacific ocean')
 plt.savefig(saveloc+"salinity_NP.png")
 plt.show()
   		
 # Seawater density
 plt.figure(figsize=(8,6))
 plt.plot(rho_sw, z, color='navy')
-plt.xlabel('Seawater density [$kg/m^3$]')
+plt.xlabel('Seawater density [kg/m$^3$]')
 plt.ylabel('Depth [m]')
-plt.title('Density profile of the North-Pacific ocean')
+#plt.title('Density profile of the North-Pacific ocean')
 plt.savefig(saveloc+"density_NP.png")
 plt.show()
 
