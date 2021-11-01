@@ -32,18 +32,18 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_densities' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 
 shapes = 4
 
+# rho_pl = np.array([50, 280, 285, 870, 875, 1020])
 
-rho_pl = np.array([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1020])
-
-# rho_pl = np.array([50, 500, 950, 1020])
+rho_pl = np.array([50, 500, 950, 1020])
 
 densities = len(rho_pl)
 
-radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
+# radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
+radius = np.linspace(0.0001,0.02, 100) #m
 sizes = len(radius)
 
 # Plotting
@@ -256,11 +256,14 @@ if vary == 'vary_shapes' and drag == True:
     plt.title('Effect of shape on oscillation - Algae thickness')
     plt.savefig(saveloc+"shapes_A.png")
     plt.show()
+    
+    w_max = np.max(w, axis=0)
+    z_max = np.min(z_25, axis=0)
 
 if vary == 'vary_densities':
     
     plt.figure(figsize=(8,6)) 
-    for i in np.arange(0,len(densities),4):
+    for i in np.arange(0,len(rho_pl),4):
         plt.plot(t/(3600)-(24*25), z_p[:,i], label='Density = {} kg/m$^3$'.format(rho_pl[i]))
     plt.xlim([0,24])
     plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
@@ -292,30 +295,39 @@ if vary == 'vary_densities':
     plt.show()
 
 if vary == 'vary_sizes':
+    # plt.figure(figsize=(8,6)) 
+    # for i in range(sizes):
+    #     plt.plot(t/(3600)-25*24, z_p[:,i], label='Radius = {} mm'.format(R_s[i]*1000))
+    # plt.xlim([0, 24])
+    # plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+    # plt.xlabel('Time [hours]')
+    # plt.ylabel('Depth [m]')
+    # plt.legend()
+    # plt.title('Plastic particle oscillation for spheres of various sizes, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    # plt.savefig(saveloc+"sizes_dep.png")
+    # plt.show()
+    
+    # # Plot of smallest size (0.1 mm), for total time interval
+    # plt.figure(figsize=(8,6)) 
+    # plt.plot(t/(3600*24), z_p[:,0], label='Radius = {} mm'.format(R_s[0]*1000))
+    # plt.xlabel('Time [days]')
+    # plt.ylabel('Depth [m]')
+    # plt.legend()
+    # plt.title('Plastic particle oscillation for smallest sphere') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    # plt.savefig(saveloc+"sizes_small.png")
+    # plt.show()
+    
+    # max velocity vs size
+    w_max = np.max(w, axis=0)
+    
     plt.figure(figsize=(8,6)) 
-    for i in range(sizes):
-        plt.plot(t/(3600)-25*24, z_p[:,i], label='Radius = {} mm'.format(R_s[i]*1000))
-    plt.xlim([0, 24])
-    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
-    plt.xlabel('Time [hours]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for spheres of various sizes, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"sizes_dep.png")
+    plt.plot(radius*1000, w_max, '.')
+    # plt.xlim([0,20])
+    plt.xlabel('Particle radius [mm]')
+    plt.ylabel('Max velocity [m/s]')
+    # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    plt.savefig(saveloc+"max_vel.png")
     plt.show()
-    
-    # Plot of smallest size (0.1 mm), for total time interval
-    plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600*24), z_p[:,0], label='Radius = {} mm'.format(R_s[0]*1000))
-    plt.xlabel('Time [days]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for smallest sphere') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"sizes_small.png")
-    plt.show()
-    
-    print('max velocities: ', np.max(w, axis=0))
-    
 
 #%% Profiles
 
