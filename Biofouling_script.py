@@ -8,7 +8,8 @@ Created on Mon Oct  4 10:24:22 2021
 import numpy as np
 import matplotlib.pyplot as plt
 
-saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
+# saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
+saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
 # Constants and parameters
 g = 9.81 # [m/s^2]
@@ -31,7 +32,7 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 
 shapes = 4
 
