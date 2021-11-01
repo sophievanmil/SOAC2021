@@ -7,6 +7,7 @@ Created on Mon Oct  4 10:24:22 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
 
 saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
 
@@ -31,11 +32,15 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_densities' # vary_shapes or vary_densities or vary_sizes
 
 shapes = 4
 
-rho_pl = np.array([50, 500, 950, 1020])
+
+rho_pl = np.array([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1020])
+
+# rho_pl = np.array([50, 500, 950, 1020])
+
 densities = len(rho_pl)
 
 radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
@@ -153,10 +158,13 @@ elif vary == 'vary_sizes':
 # define matrices
 w = np.zeros((len_t,length))
 z_p = np.zeros((len_t,length))
+z_25 = z_p[int(25*24*3600/dt):int(26*24*3600/dt),:]
 rho_p = np.zeros((len_t,length))
 A = np.zeros((len_t,length))
 V_bf = np.zeros((len_t,length))
 V_p = np.zeros((len_t,length))
+nr_peaks = np.zeros(length)
+
 
 # initial conditions
 V_bf[0,0] = V_pl[0]/100
@@ -201,8 +209,11 @@ for j in range(length):
         if z_p[i+1,j] >= 0: # particle is at surface
             z_p[i+1,j] = 0
             w[i+1,j] = 0
-
- 
+            
+    z_25[:,j] = z_p[int(25*24*3600/dt):int(26*24*3600/dt),j]
+    
+    nr_peaks[j] = len(find_peaks(-z_25[:,j])[0])
+    
 #%%
 ## Particle depth
 if vary == 'vary_shapes' and drag == True:
@@ -247,8 +258,9 @@ if vary == 'vary_shapes' and drag == True:
     plt.show()
 
 if vary == 'vary_densities':
+    
     plt.figure(figsize=(8,6)) 
-    for i in range(densities):
+    for i in np.arange(0,len(densities),4):
         plt.plot(t/(3600)-(24*25), z_p[:,i], label='Density = {} kg/m$^3$'.format(rho_pl[i]))
     plt.xlim([0,24])
     plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
@@ -267,6 +279,16 @@ if vary == 'vary_densities':
     plt.legend()
     plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
     plt.savefig(saveloc+"densities_long.png")
+    plt.show()
+    
+    # FIND AMOUNT OF OSCILLATIONS
+    plt.figure(figsize=(8,6)) 
+    plt.plot(rho_pl, nr_peaks)
+    # plt.xlim([0,20])
+    plt.xlabel('Plastic density [kg/m$^3$]')
+    plt.ylabel('Nr oscillations')
+    # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    # plt.savefig(saveloc+"densities_long.png")
     plt.show()
 
 if vary == 'vary_sizes':
