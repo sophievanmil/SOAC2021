@@ -33,28 +33,22 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-
 vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 many_densities = False
 many_sizes = False
 
 shapes = 4
 
-# rho_pl = np.array([50, 280, 285, 870, 875, 1020])
 
 rho_pl = np.array([50, 500, 950, 1020])
-
-densities = len(rho_pl)
-
-radius = np.linspace(0.0001,0.02, 100) #m
 if vary == 'vary_densities' and many_densities == True:
     rho_pl = np.array([50, 280, 285, 870, 875, 1020])
 
 densities = len(rho_pl)
 
-radius = np.linspace(0.0001,0.02, 100) #m
+radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
 if vary == 'vary_sizes' and many_sizes == True:
-    radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
+    radius = np.linspace(0.0001,0.02, 100) #m
   
 sizes = len(radius)
 
@@ -414,10 +408,10 @@ plt.show()
 
 if vary == 'vary_shapes' and drag == False:
     plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere')
+    plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_shapes[3], label='Sphere')
     # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
-    plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally')
-    plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_4[1], label='Film')
+    plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_shapes[0], label='Cylinder falling horizontally')
+    plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_shapes[1], label='Film')
     plt.xlim([0,24])
     plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
     plt.xlabel('Time [hours]')
