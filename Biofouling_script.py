@@ -32,6 +32,7 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
+
 vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 
 shapes = 4
@@ -127,7 +128,10 @@ I_0 = 1.2e8 /(24*3600) # [mu E /m^2/s], light intensity at surface without day/n
 I_fluc = I_0 * np.sin(2*np.pi*(t-6*(3600))/(3600*24))
 I_fluc = np.where(I_fluc < 0, 0, I_fluc)
 
+# I_fluc = np.ones(len(t))*I_0
+
 I = np.matmul(I_fluc.reshape((len(I_fluc),1)),np.exp(epsilon * z).reshape((1,len(z))))
+
 
 # Algae growth
 T_min  = 0.2                        # Minimum temperatuer for algae growth [degrees Celcius]
@@ -372,18 +376,19 @@ plt.show()
 
 #%% Figures
 
-# if vary == 'vary_shapes' and drag == False:
-#     plt.figure(figsize=(8,6)) 
-#     plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere')
-#     # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
-#     plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally')
-#     plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_4[1], label='Film')
-#     # plt.xlim([0,24])
-#     plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
-#     plt.xlabel('Time [hours]')
-#     plt.ylabel('Depth [m]')
-#     plt.legend()
-#     plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-#     plt.savefig(saveloc+"part_dep_shapes_constantdrag.png")
-#     plt.show()
-#  # TO DO: PLOTJE MET GEDEELDE X-AS en zonkracht  
+if vary == 'vary_shapes' and drag == False:
+    plt.figure(figsize=(8,6)) 
+    plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere')
+    # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
+    plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally')
+    plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_4[1], label='Film')
+    plt.xlim([0,24])
+    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+    plt.xlabel('Time [hours]')
+    plt.ylabel('Depth [m]')
+    plt.legend()
+    plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    # plt.savefig(saveloc+"part_dep_shapes_constantdrag.png")
+    plt.show()
+  # TO DO: PLOTJE MET GEDEELDE X-AS en zonkracht  
+  
