@@ -64,6 +64,7 @@ plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+plt.rcParams.update({"axes.facecolor":(1,1,1,0.5),"savefig.facecolor":(1,1,1,0.5)})
 
 #%% VARY SHAPES/DENSITY/RADIUS
 if vary == 'vary_shapes':
@@ -260,7 +261,7 @@ if vary == 'vary_shapes' and drag == True:
     plt.ylabel('Biofilm volume [m$^{3}]$')
     plt.legend()
     #plt.title('Effect of shape on biofilm volume')
-    plt.savefig(saveloc+"shapes_bf.png")
+    plt.savefig(saveloc+"shapes_bf.png",bbox_inches='tight')
     plt.show()
     
     ## Algae per m^2
@@ -273,7 +274,7 @@ if vary == 'vary_shapes' and drag == True:
     plt.ylabel('A [Nr algae /m$^2$] ')
     plt.legend()
     #plt.title('Effect of shape on algae thickness')
-    plt.savefig(saveloc+"shapes_A.png")
+    plt.savefig(saveloc+"shapes_A.png",bbox_inches='tight')
     plt.show()
     
     w_max = np.max(w, axis=0)
@@ -290,7 +291,7 @@ if vary == 'vary_densities':
         plt.ylabel('Depth [m]')
         plt.legend()
         #plt.title('Plastic particle oscillation for spheres of various densities, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-        plt.savefig(saveloc+"densities_dep.png")
+        plt.savefig(saveloc+"densities_dep.png",bbox_inches='tight')
         plt.show()
         
         plt.figure(figsize=(8,6)) 
@@ -300,7 +301,7 @@ if vary == 'vary_densities':
         plt.ylabel('Depth [m]')
         plt.legend()
         #plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-        plt.savefig(saveloc+"densities_long.png")
+        plt.savefig(saveloc+"densities_long.png",bbox_inches='tight')
         # plt.show()
         
     if many_densities == True:
@@ -311,7 +312,7 @@ if vary == 'vary_densities':
         plt.yticks([0, int(1), int(2), int(3)])
         plt.ylabel('Nr oscillations')
         # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-        plt.savefig(saveloc+"densities_osc.png")
+        plt.savefig(saveloc+"densities_osc.png",bbox_inches='tight')
         plt.show()
 
 if vary == 'vary_sizes':
@@ -325,7 +326,7 @@ if vary == 'vary_sizes':
          plt.ylabel('Depth [m]')
          plt.legend()
         # plt.title('Plastic particle oscillation for spheres of various sizes, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-         plt.savefig(saveloc+"sizes_dep.png")
+         plt.savefig(saveloc+"sizes_dep.png",bbox_inches='tight')
          plt.show()
         
          # Plot of smallest size (0.1 mm), for total time interval
@@ -335,7 +336,7 @@ if vary == 'vary_sizes':
          plt.ylabel('Depth [m]')
          plt.legend()
          #plt.title('Plastic particle oscillation for smallest sphere') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-         plt.savefig(saveloc+"sizes_small.png")
+         plt.savefig(saveloc+"sizes_small.png",bbox_inches='tight')
          plt.show()
          
      if many_sizes == True:
@@ -348,7 +349,7 @@ if vary == 'vary_sizes':
         plt.xlabel('Particle radius [mm]')
         plt.ylabel('Max velocity [m/s]')
         # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-        plt.savefig(saveloc+"max_vel.png")
+        plt.savefig(saveloc+"max_vel.png",bbox_inches='tight')
         plt.show()
 
 #%% Profiles
@@ -358,11 +359,11 @@ plt.figure(figsize=(8,6))
 plt.contourf(t/(3600)-25*24,z,np.transpose(I))
 plt.xlim([0,24])
 plt.ylim([-20,0])
-plt.xlabel('Time [days]')
+plt.xlabel('Time [hours]')
 plt.ylabel('Depth [m]')
 plt.colorbar(label='Light intensity [$\mu$ E /(m$^{2}$s)]')
 #plt.title('Light penetration')
-plt.savefig(saveloc+"sealight_zoomed.png")
+plt.savefig(saveloc+"sealight_zoomed.png",bbox_inches='tight')
 plt.show()
 
 ## Seawater light fluctuation
@@ -374,7 +375,7 @@ plt.xlabel('Time [days]')
 plt.ylabel('Depth [m]')
 plt.colorbar(label='Light intensity [$\mu$ E /(m$^{2}$s)]')
 #plt.title('Light penetration')
-plt.savefig(saveloc+"sealight.png")
+plt.savefig(saveloc+"sealight.png",bbox_inches='tight')
 plt.show()
 
 # Seawater temperature
@@ -383,7 +384,7 @@ plt.plot(T, z, 'r')
 plt.xlabel('Temperature [$\degree$ C]')
 plt.ylabel('Depth [m]')
 #plt.title('Temperature profile of the North-Pacific ocean')
-plt.savefig(saveloc+"temp_NP.png")
+plt.savefig(saveloc+"temp_NP.png",bbox_inches='tight')
 plt.show()
 
 # Seawater salinity
@@ -392,35 +393,31 @@ plt.plot(S*1000, z, color='grey')
 plt.xlabel('Salinity [g/kg]')
 plt.ylabel('Depth [m]')
 #plt.title('Salinity profile of the North-Pacific ocean')
-plt.savefig(saveloc+"salinity_NP.png")
+plt.savefig(saveloc+"salinity_NP.png",bbox_inches='tight')
 plt.show()
 
+#%%
 # create figure and axis objects with subplots()
-fig,ax = plt.subplots()
+plt.rcParams.update({"axes.facecolor":(1,1,1,0.5),"savefig.facecolor":(1,1,1,0.5)})
+fig,ax = plt.subplots(figsize=(8,15))
 # make a plot
 ax.plot(T, z, 'r')
 # set x-axis label
 ax.set_xlabel("Temperature [$\degree$ C]",color='red')
-ax.xticks(color='red')
+ax.tick_params(axis='x', colors='red')
 # set y-axis label
 ax.set_ylabel("Depth [m]")
 ax2=ax.twiny()
 # make a plot with different y-axis using second axis object
 ax2.plot(S*1000, z, color='grey')
-ax2.xticks(color='grey')
+ax2.tick_params(axis='x', colors='grey')
 ax2.set_xlabel("Salinity [g/kg]",color="grey")
+ax.set_ylim([-1000,0])
 plt.show()
 # save the plot as a file
 fig.savefig(saveloc+"temp_sal.png",bbox_inches='tight')
-  		
-# Seawater density
-plt.figure(figsize=(8,6))
-plt.plot(rho_sw, z, color='navy')
-plt.xlabel('Seawater density [$kg/m^3$]')
-plt.ylabel('Depth [m]')
-plt.title('Density profile of the North-Pacific ocean')
-plt.savefig(saveloc+"density_NP.png")
-plt.show()
+
+#%%
   		
 # Seawater density
 plt.figure(figsize=(8,6))
@@ -428,7 +425,7 @@ plt.plot(rho_sw, z, color='navy')
 plt.xlabel('Seawater density [kg/m$^3$]')
 plt.ylabel('Depth [m]')
 #plt.title('Density profile of the North-Pacific ocean')
-plt.savefig(saveloc+"density_NP.png")
+plt.savefig(saveloc+"density_NP.png",bbox_inches='tight')
 plt.show()
 
 #%% Figures
