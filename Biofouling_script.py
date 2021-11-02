@@ -33,27 +33,32 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_densities' # vary_shapes or vary_densities or vary_sizes
+
+vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 many_densities = False
 many_sizes = False
 
 shapes = 4
 
+# rho_pl = np.array([50, 280, 285, 870, 875, 1020])
+
 rho_pl = np.array([50, 500, 950, 1020])
+
+densities = len(rho_pl)
+
+radius = np.linspace(0.0001,0.02, 100) #m
 if vary == 'vary_densities' and many_densities == True:
     rho_pl = np.array([50, 280, 285, 870, 875, 1020])
 
 densities = len(rho_pl)
 
-#radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
 radius = np.linspace(0.0001,0.02, 100) #m
 if vary == 'vary_sizes' and many_sizes == True:
     radius = np.array([0.0001, 0.001, 0.005, 0.01]) #m
-    
+  
 sizes = len(radius)
 
 # Plotting
-# colors_4 = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
 colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e'] 
 MEDIUM_SIZE = 13
 BIGGER_SIZE = 16
@@ -67,7 +72,6 @@ plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 #%% VARY SHAPES/DENSITY/RADIUS
-
 if vary == 'vary_shapes':
     theta_p = np.zeros(shapes)
     A_proj = np.zeros(shapes)
@@ -144,7 +148,10 @@ I_0 = 1.2e8 /(24*3600) # [mu E /m^2/s], light intensity at surface without day/n
 I_fluc = I_0 * np.sin(2*np.pi*(t-6*(3600))/(3600*24))
 I_fluc = np.where(I_fluc < 0, 0, I_fluc)
 
+# I_fluc = np.ones(len(t))*I_0
+
 I = np.matmul(I_fluc.reshape((len(I_fluc),1)),np.exp(epsilon * z).reshape((1,len(z))))
+
 
 # Algae growth
 T_min  = 0.2                        # Minimum temperatuer for algae growth [degrees Celcius]
@@ -278,7 +285,7 @@ if vary == 'vary_shapes' and drag == True:
     w_max = np.max(w, axis=0)
     z_max = np.min(z_25, axis=0)
 
-if vary == 'vary_densities':
+if vary == 'vary_densities':    
     if many_densities == False:
         plt.figure(figsize=(8,6)) 
         for i in np.arange(0,len(rho_pl),1):
@@ -405,18 +412,19 @@ plt.show()
 
 #%% Figures
 
-# if vary == 'vary_shapes' and drag == False:
-#     plt.figure(figsize=(8,6)) 
-#     plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere')
-#     # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
-#     plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally')
-#     plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_4[1], label='Film')
-#     # plt.xlim([0,24])
-#     plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
-#     plt.xlabel('Time [hours]')
-#     plt.ylabel('Depth [m]')
-#     plt.legend()
-#     plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-#     plt.savefig(saveloc+"part_dep_shapes_constantdrag.png")
-#     plt.show()
-#  # TO DO: PLOTJE MET GEDEELDE X-AS en zonkracht  
+if vary == 'vary_shapes' and drag == False:
+    plt.figure(figsize=(8,6)) 
+    plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_4[3], label='Sphere')
+    # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
+    plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_4[0], label='Cylinder falling horizontally')
+    plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_4[1], label='Film')
+    plt.xlim([0,24])
+    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+    plt.xlabel('Time [hours]')
+    plt.ylabel('Depth [m]')
+    plt.legend()
+    plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
+    # plt.savefig(saveloc+"part_dep_shapes_constantdrag.png")
+    plt.show()
+  # TO DO: PLOTJE MET GEDEELDE X-AS en zonkracht  
+  
