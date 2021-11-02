@@ -9,8 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
-#saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
-saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
+saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
+# saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
 # Constants and parameters
 g = 9.81 # [m/s^2]
@@ -393,6 +393,33 @@ plt.xlabel('Salinity [g/kg]')
 plt.ylabel('Depth [m]')
 #plt.title('Salinity profile of the North-Pacific ocean')
 plt.savefig(saveloc+"salinity_NP.png")
+plt.show()
+
+# create figure and axis objects with subplots()
+fig,ax = plt.subplots()
+# make a plot
+ax.plot(T, z, 'r')
+# set x-axis label
+ax.set_xlabel("Temperature [$\degree$ C]",color='red')
+ax.xticks(color='red')
+# set y-axis label
+ax.set_ylabel("Depth [m]")
+ax2=ax.twiny()
+# make a plot with different y-axis using second axis object
+ax2.plot(S*1000, z, color='grey')
+ax2.xticks(color='grey')
+ax2.set_xlabel("Salinity [g/kg]",color="grey")
+plt.show()
+# save the plot as a file
+fig.savefig(saveloc+"temp_sal.png",bbox_inches='tight')
+  		
+# Seawater density
+plt.figure(figsize=(8,6))
+plt.plot(rho_sw, z, color='navy')
+plt.xlabel('Seawater density [$kg/m^3$]')
+plt.ylabel('Depth [m]')
+plt.title('Density profile of the North-Pacific ocean')
+plt.savefig(saveloc+"density_NP.png")
 plt.show()
   		
 # Seawater density
