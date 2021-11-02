@@ -354,6 +354,18 @@ if vary == 'vary_sizes':
 
 ## Seawater light fluctuation
 plt.figure(figsize=(8,6))
+plt.contourf(t/(3600)-25*24,z,np.transpose(I))
+plt.xlim([0,24])
+plt.ylim([-20,0])
+plt.xlabel('Time [days]')
+plt.ylabel('Depth [m]')
+plt.colorbar(label='Light intensity [$\mu$ E /(m$^{2}$s)]')
+#plt.title('Light penetration')
+plt.savefig(saveloc+"sealight_zoomed.png")
+plt.show()
+
+## Seawater light fluctuation
+plt.figure(figsize=(8,6))
 plt.contourf(t/(3600*24),z,np.transpose(I))
 plt.xlim([25,30])
 plt.ylim([-20,0])
