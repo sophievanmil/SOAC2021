@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
-saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
+saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\\SOAC\BioFouling\\'
 # saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
 # Constants and parameters
@@ -64,7 +64,7 @@ plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
-plt.rcParams.update({"axes.facecolor":(1,1,1,0.5),"savefig.facecolor":(1,1,1,0.5)})
+plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
 
 #%% VARY SHAPES/DENSITY/RADIUS
 if vary == 'vary_shapes':
@@ -397,25 +397,19 @@ plt.savefig(saveloc+"salinity_NP.png",bbox_inches='tight')
 plt.show()
 
 #%%
-# create figure and axis objects with subplots()
-plt.rcParams.update({"axes.facecolor":(1,1,1,0.5),"savefig.facecolor":(1,1,1,0.5)})
 fig,ax = plt.subplots(figsize=(8,15))
-# make a plot
 ax.plot(T, z, 'r')
-# set x-axis label
 ax.set_xlabel("Temperature [$\degree$ C]",color='red')
 ax.tick_params(axis='x', colors='red')
-# set y-axis label
 ax.set_ylabel("Depth [m]")
 ax2=ax.twiny()
-# make a plot with different y-axis using second axis object
 ax2.plot(S*1000, z, color='grey')
 ax2.tick_params(axis='x', colors='grey')
 ax2.set_xlabel("Salinity [g/kg]",color="grey")
 ax.set_ylim([-1000,0])
+fig.savefig(saveloc+"temp_sal.png", bbox_inches='tight')
 plt.show()
-# save the plot as a file
-fig.savefig(saveloc+"temp_sal.png",bbox_inches='tight')
+
 
 #%%
   		
