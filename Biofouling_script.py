@@ -12,6 +12,7 @@ from scipy.signal import find_peaks
 saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\\SOAC\BioFouling\\'
 # saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
+
 # Constants and parameters
 g = 9.81 # [m/s^2]
 nu = 0.00109 # [N s/m^2], viscosity
@@ -57,6 +58,7 @@ colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e']
 MEDIUM_SIZE = 13
 BIGGER_SIZE = 16
 
+plt.rcParams.update(plt.rcParamsDefault)
 plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
 plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
 plt.rc('axes', labelsize=BIGGER_SIZE)    # fontsize of the x and y labels
@@ -397,7 +399,10 @@ plt.savefig(saveloc+"salinity_NP.png",bbox_inches='tight')
 plt.show()
 
 #%%
-fig,ax = plt.subplots(figsize=(8,15))
+
+fig,ax = plt.subplots(figsize=(4, 16))
+# make a plot
+
 ax.plot(T, z, 'r')
 ax.set_xlabel("Temperature [$\degree$ C]",color='red')
 ax.tick_params(axis='x', colors='red')
