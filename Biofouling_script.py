@@ -58,6 +58,7 @@ colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e']
 MEDIUM_SIZE = 13
 BIGGER_SIZE = 16
 
+<<<<<<< Updated upstream
 plt.rcParams.update(plt.rcParamsDefault)
 plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
 plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
@@ -67,6 +68,18 @@ plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
+=======
+plt.rcdefaults()
+plt.rcParams['font.size']=MEDIUM_SIZE          # controls default text sizes
+plt.rcParams['axes.titlesize']=BIGGER_SIZE    # fontsize of the axes title
+plt.rcParams['axes.labelsize']=BIGGER_SIZE    # fontsize of the x and y labels
+plt.rcParams['xtick.labelsize']=MEDIUM_SIZE    # fontsize of the tick labels
+plt.rcParams['ytick.labelsize']=MEDIUM_SIZE    # fontsize of the tick labels
+plt.rcParams['legend.fontsize']=MEDIUM_SIZE   # legend fontsize
+plt.rcParams['figure.titlesize']=MEDIUM_SIZE # fontsize of the figure title
+plt.rcParams["axes.facecolor"] = (1,1,1,0.7)
+plt.rcParams["savefig.facecolor"] = (1,1,1,0.7)
+>>>>>>> Stashed changes
 
 #%% VARY SHAPES/DENSITY/RADIUS
 if vary == 'vary_shapes':
@@ -240,18 +253,21 @@ for j in range(length):
 
 if vary == 'vary_shapes' and drag == True:  
     plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600)-(25*24), z_p[:,0], color = colors_shapes[0], label='Sphere, K = {0:1.5f}'.format(K[0]))
-    plt.plot(t/(3600)-(25*24), z_p[:,1], color = colors_shapes[1], label='Cylinder falling vertically, K = {0:1.5f}'.format(K[1]))
-    plt.plot(t/(3600)-(25*24), z_p[:,2], color = colors_shapes[2], label='Cylinder falling horizontally, K = {0:1.5f}'.format(K[2]))
-    plt.plot(t/(3600)-(25*24), z_p[:,3], color = colors_shapes[3], label='Film, K = {0:1.5f}'.format(K[3]))
+    plt.plot(t/(3600)-(25*24), z_p[:,0], color = colors_shapes[0], label='Sphere, K = {0:1.3f}'.format(K[0]))
+    plt.plot(t/(3600)-(25*24), z_p[:,1], color = colors_shapes[1], label='Cylinder: vertical, K = {0:1.3f}'.format(K[1]))
+    plt.plot(t/(3600)-(25*24), z_p[:,2], color = colors_shapes[2], label='Cylinder: horizontal, K = {0:1.3f}'.format(K[2]))
+    plt.plot(t/(3600)-(25*24), z_p[:,3], color = colors_shapes[3], label='Film, K = {0:1.3f}'.format(K[3]))
     plt.xlim([0,48])
     plt.xticks(np.arange(0,54,6))
     plt.xlabel('Time [hours]')
     plt.ylabel('Depth [m]')
-    plt.legend()
+    plt.legend(loc='upper center', bbox_to_anchor=(0.48, 1.15),
+          ncol=2, fancybox=True)
     #plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    plt.savefig(saveloc+"shapes_dep.png")
+    plt.savefig(saveloc+"shapes_dep.png",bbox_inches='tight')
     plt.show()
+    
+    #%%
     
     ## Biofilm volume
     plt.figure(figsize=(8,6))
