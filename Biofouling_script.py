@@ -9,8 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
-saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
-# saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
+# saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\SOAC\BioFouling//'
+saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
 # Constants and parameters
 g = 9.81 # [m/s^2]
@@ -57,6 +57,7 @@ colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e']
 MEDIUM_SIZE = 13
 BIGGER_SIZE = 16
 
+plt.rcParams.update(plt.rcParamsDefault)
 plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
 plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
 plt.rc('axes', labelsize=BIGGER_SIZE)    # fontsize of the x and y labels
@@ -64,7 +65,7 @@ plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
-plt.rcParams.update({"axes.facecolor":(1,1,1,0.5),"savefig.facecolor":(1,1,1,0.5)})
+plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
 
 #%% VARY SHAPES/DENSITY/RADIUS
 if vary == 'vary_shapes':
@@ -398,8 +399,7 @@ plt.show()
 
 #%%
 # create figure and axis objects with subplots()
-plt.rcParams.update({"axes.facecolor":(1,1,1,0.5),"savefig.facecolor":(1,1,1,0.5)})
-fig,ax = plt.subplots(figsize=(8,15))
+fig,ax = plt.subplots(figsize=(4, 16))
 # make a plot
 ax.plot(T, z, 'r')
 # set x-axis label
