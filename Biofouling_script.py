@@ -58,7 +58,7 @@ colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e']
 MEDIUM_SIZE = 13
 BIGGER_SIZE = 16
 
-<<<<<<< Updated upstream
+
 plt.rcParams.update(plt.rcParamsDefault)
 plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
 plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
@@ -68,18 +68,7 @@ plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
-=======
-plt.rcdefaults()
-plt.rcParams['font.size']=MEDIUM_SIZE          # controls default text sizes
-plt.rcParams['axes.titlesize']=BIGGER_SIZE    # fontsize of the axes title
-plt.rcParams['axes.labelsize']=BIGGER_SIZE    # fontsize of the x and y labels
-plt.rcParams['xtick.labelsize']=MEDIUM_SIZE    # fontsize of the tick labels
-plt.rcParams['ytick.labelsize']=MEDIUM_SIZE    # fontsize of the tick labels
-plt.rcParams['legend.fontsize']=MEDIUM_SIZE   # legend fontsize
-plt.rcParams['figure.titlesize']=MEDIUM_SIZE # fontsize of the figure title
-plt.rcParams["axes.facecolor"] = (1,1,1,0.7)
-plt.rcParams["savefig.facecolor"] = (1,1,1,0.7)
->>>>>>> Stashed changes
+
 
 #%% VARY SHAPES/DENSITY/RADIUS
 if vary == 'vary_shapes':
