@@ -9,8 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
-saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\\SOAC\BioFouling\\'
-# saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
+# saveloc = 'C:\\Users\\marle\\OneDrive\\Documenten\\Msc_CP\\SOAC\BioFouling\\'
+saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling/'
 
 
 # Constants and parameters
@@ -34,9 +34,9 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
 many_densities = False
-many_sizes = False
+many_sizes = True
 
 shapes = 4
 
@@ -67,7 +67,7 @@ plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
-plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
+# plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
 
 
 #%% VARY SHAPES/DENSITY/RADIUS
@@ -256,7 +256,6 @@ if vary == 'vary_shapes' and drag == True:
     plt.savefig(saveloc+"shapes_dep.png",bbox_inches='tight')
     plt.show()
     
-    #%%
     
     ## Biofilm volume
     plt.figure(figsize=(8,6))
@@ -356,7 +355,7 @@ if vary == 'vary_sizes':
         plt.xlabel('Particle radius [mm]')
         plt.ylabel('Max velocity [m/s]')
         # plt.title('Plastic particle oscillation for density similar to seawater') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-        plt.savefig(saveloc+"max_vel.png",bbox_inches='tight')
+        plt.savefig(saveloc+"max_vel_nontransparanent.png",bbox_inches='tight')
         plt.show()
 
 #%% Profiles
@@ -390,6 +389,7 @@ plt.figure(figsize=(8,6))
 plt.plot(T, z, 'r')
 plt.xlabel('Temperature [$\degree$ C]')
 plt.ylabel('Depth [m]')
+plt.ylim([-1000,0])
 #plt.title('Temperature profile of the North-Pacific ocean')
 plt.savefig(saveloc+"temp_NP.png",bbox_inches='tight')
 plt.show()
@@ -399,15 +399,15 @@ plt.figure(figsize=(8,6))
 plt.plot(S*1000, z, color='grey')
 plt.xlabel('Salinity [g/kg]')
 plt.ylabel('Depth [m]')
+plt.ylim([-1000,0])
 #plt.title('Salinity profile of the North-Pacific ocean')
 plt.savefig(saveloc+"salinity_NP.png",bbox_inches='tight')
 plt.show()
 
 #%%
 
-fig,ax = plt.subplots(figsize=(4, 16))
+fig,ax = plt.subplots(figsize=(7, 16))
 # make a plot
-
 ax.plot(T, z, 'r')
 ax.set_xlabel("Temperature [$\degree$ C]",color='red')
 ax.tick_params(axis='x', colors='red')
@@ -419,15 +419,14 @@ ax2.set_xlabel("Salinity [g/kg]",color="grey")
 ax.set_ylim([-1000,0])
 fig.savefig(saveloc+"temp_sal.png", bbox_inches='tight')
 plt.show()
-
-
-#%%
   		
 # Seawater density
-plt.figure(figsize=(8,6))
+plt.figure(figsize=(7,16))
 plt.plot(rho_sw, z, color='navy')
 plt.xlabel('Seawater density [kg/m$^3$]')
 plt.ylabel('Depth [m]')
+plt.xticks([1024.0, 1025.0, 1026.0, 1027.0])
+plt.ylim([-1000,0])
 #plt.title('Density profile of the North-Pacific ocean')
 plt.savefig(saveloc+"density_NP.png",bbox_inches='tight')
 plt.show()
