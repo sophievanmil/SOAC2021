@@ -34,12 +34,11 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 many_densities = False
-many_sizes = True
+many_sizes = False
 
 shapes = 4
-
 
 rho_pl = np.array([50, 500, 950, 1020])
 if vary == 'vary_densities' and many_densities == True:
