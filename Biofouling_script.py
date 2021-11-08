@@ -34,7 +34,7 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
 many_densities = False
 many_sizes = False
 
@@ -55,10 +55,10 @@ sizes = len(radius)
 
 # Plotting
 colors_shapes = ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e'] 
+colors_densities = [ '#1f77b4', '#ff7f0e','#d62728', '#2ca02c'] 
 MEDIUM_SIZE = 13
 BIGGER_SIZE = 16
 
-<<<<<<< Updated upstream
 plt.rcParams.update(plt.rcParamsDefault)
 plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
 plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
@@ -68,18 +68,6 @@ plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rcParams.update({"axes.facecolor":(1,1,1,0.7),"savefig.facecolor":(1,1,1,0.7)})
-=======
-plt.rcdefaults()
-plt.rcParams['font.size']=MEDIUM_SIZE          # controls default text sizes
-plt.rcParams['axes.titlesize']=BIGGER_SIZE    # fontsize of the axes title
-plt.rcParams['axes.labelsize']=BIGGER_SIZE    # fontsize of the x and y labels
-plt.rcParams['xtick.labelsize']=MEDIUM_SIZE    # fontsize of the tick labels
-plt.rcParams['ytick.labelsize']=MEDIUM_SIZE    # fontsize of the tick labels
-plt.rcParams['legend.fontsize']=MEDIUM_SIZE   # legend fontsize
-plt.rcParams['figure.titlesize']=MEDIUM_SIZE # fontsize of the figure title
-plt.rcParams["axes.facecolor"] = (1,1,1,0.7)
-plt.rcParams["savefig.facecolor"] = (1,1,1,0.7)
->>>>>>> Stashed changes
 
 #%% VARY SHAPES/DENSITY/RADIUS
 if vary == 'vary_shapes':
@@ -315,6 +303,7 @@ if vary == 'vary_densities':
         plt.figure(figsize=(8,6)) 
         plt.plot(t/(3600*24), z_p[:,-1], 'r', label='Density = {} kg/m$^3$'.format(rho_pl[-1]))
         plt.xlim([0,20])
+        plt.xticks([0, 5, 10, 15, 20])
         plt.xlabel('Time [days]')
         plt.ylabel('Depth [m]')
         plt.legend()
@@ -416,7 +405,7 @@ plt.show()
 
 #%%
 
-fig,ax = plt.subplots(figsize=(4, 16))
+fig,ax = plt.subplots(figsize=(5, 12))
 # make a plot
 
 ax.plot(T, z, 'r')
@@ -443,21 +432,142 @@ plt.ylabel('Depth [m]')
 plt.savefig(saveloc+"density_NP.png",bbox_inches='tight')
 plt.show()
 
-#%% Figures
+#%% Animation preparation
+from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
+import matplotlib as mpl 
 
-if vary == 'vary_shapes' and drag == False:
-    plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600)-25*24, z_p[:,0], color = colors_shapes[3], label='Sphere')
-    # plt.plot(t/(3600)-25*24, z_p[:,1], color = colors_4[2], label='Cylinder falling vertically')
-    plt.plot(t/(3600)-25*24, z_p[:,2], color = colors_shapes[0], label='Cylinder falling horizontally')
-    plt.plot(t/(3600)-25*24, z_p[:,3], color = colors_shapes[1], label='Film')
-    plt.xlim([0,24])
-    plt.xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
-    plt.xlabel('Time [hours]')
-    plt.ylabel('Depth [m]')
-    plt.legend()
-    plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
-    # plt.savefig(saveloc+"part_dep_shapes_constantdrag.png")
-    plt.show()
-  # TO DO: PLOTJE MET GEDEELDE X-AS en zonkracht  
-  
+
+def mscatter(x,y,ax=None, m=None, **kw):
+    import matplotlib.markers as mmarkers
+    if not ax: ax=plt.gca()
+    sc = ax.scatter(x,y,**kw)
+    if (m is not None) and (len(m)==len(x)):
+        paths = []
+        for marker in m:
+            if isinstance(marker, mmarkers.MarkerStyle):
+                marker_obj = marker
+            else:
+                marker_obj = mmarkers.MarkerStyle(marker)
+            path = marker_obj.get_path().transformed(
+                        marker_obj.get_transform())
+            paths.append(path)
+        sc.set_paths(paths)
+    return sc
+
+mpl.rcParams['animation.ffmpeg_path'] = r'C:\\Users\\marle\\OneDrive\\Documenten\\ffmpeg\\bin\\ffmpeg.exe'
+
+
+#%% Shapes animation
+if vary == 'vary_shapes' and drag == True:  
+    fig, ax = plt.subplots(figsize=(10, 16))
+    fig.set_tight_layout(True)
+    ax.set(xlim=(-0.2,3.2), ylim=(-100, 0))
+    # ax.set_ylabel('Depth', fontsize=20)
+    
+    x = np.array([0,1,2,3])
+    z_5 = z_p[int(25*24*3600/dt):-1,:]
+    t_5 = t[int(25*24*3600/dt):-1]/(3600)-(24*25)
+    day = t_5/24+25
+    t_5 = t[int(25*24*3600/dt):-1]/(3600)-(24*np.floor(day))
+    
+    xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    xlabels = ['Sphere', 'Cylinder (hor)', 'Cylinder (ver)', 'Film']
+    ylabels = [item.get_text() for item in ax.get_yticklabels()]
+    ylabels = ['Surface (z=0)']
+    markers = np.repeat(['o','|','_','s'], len(xlabels)/4)
+    linewidths= [1,3,3,1]
+    sizes = [200, 1000, 1000, 200]
+    
+    ax.set_xticks(x)
+    ax.set_xticklabels(xlabels, fontsize=20)
+    ax.set_yticks(np.array([0]))
+    ax.set_yticklabels(ylabels, fontsize=20)
+    
+    scat = mscatter(x, z_5[0,:], c=colors_shapes, s=sizes, m=markers, linewidths=5, ax=ax)
+    
+    def animate(i):
+        y = z_5[i,:]
+        scat.set_offsets(np.c_[x, y]) 
+        ax.set_title('day '+str(int(np.floor(day[i])))+', hour '+str(int(np.floor(t_5[i]))), fontsize=20)
+    
+    anim = FuncAnimation(fig, animate, interval=100, repeat=True, save_count=len(z_5[:,0])-1)
+
+writervideo = animation.FFMpegWriter(fps=100) 
+anim.save(saveloc+'animation_shape.mp4', writer=writervideo)
+
+#%% Densities animation
+if vary == 'vary_densities':    
+    fig, ax = plt.subplots(figsize=(10, 16))
+    fig.set_tight_layout(True)
+    ax.set(xlim=(-0.5,3.5), ylim=(-100, 0))
+    # ax.set_ylabel('Depth', fontsize=20)
+    
+    x = np.array([0,1,2,3])
+    z_5 = z_p[int(25*24*3600/dt):-1,:]
+    t_5 = t[int(25*24*3600/dt):-1]/(3600)-(24*25)
+    day = t_5/24+25
+    t_5 = t[int(25*24*3600/dt):-1]/(3600)-(24*np.floor(day))
+    
+    xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    xlabels = ['50 kg/m$^3$', '500 kg/m$^3$', '950 kg/m$^3$', '1020 kg/m$^3$']
+    ylabels = [item.get_text() for item in ax.get_yticklabels()]
+    ylabels = ['Surface (z=0)']
+    markers = np.repeat(['o','|','_','s'], len(xlabels)/4)
+    linewidths= [1,3,3,1]
+    sizes = [200, 1000, 1000, 200]
+    
+    ax.set_xticks(x)
+    ax.set_xticklabels(xlabels, fontsize=20)
+    ax.set_yticks(np.array([0]))
+    ax.set_yticklabels(ylabels, fontsize=20)
+    
+    scat = mscatter(x, z_5[0,:], color=colors_densities, s=300, ax=ax)
+    
+    def animate(i):
+        y = z_5[i,:]
+        scat.set_offsets(np.c_[x, y]) 
+        ax.set_title('day '+str(int(np.floor(day[i])))+', hour '+str(int(np.floor(t_5[i]))), fontsize=20)
+    
+    anim = FuncAnimation(fig, animate, interval=100, repeat=True, save_count=len(z_5[:,0])-1)
+    
+    writervideo = animation.FFMpegWriter(fps=100) 
+    anim.save(saveloc+'animation_dens.mp4', writer=writervideo)
+
+#%% Size animation
+if vary == 'vary_sizes':    
+    fig, ax = plt.subplots(figsize=(10, 16))
+    fig.set_tight_layout(True)
+    ax.set(xlim=(-0.5,3.5), ylim=(-100, 0))
+    # ax.set_ylabel('Depth', fontsize=20)
+    
+    x = np.array([0,1,2,3])
+    z_5 = z_p[int(25*24*3600/dt):-1,:]
+    t_5 = t[int(25*24*3600/dt):-1]/(3600)-(24*25)
+    day = t_5/24+25
+    t_5 = t[int(25*24*3600/dt):-1]/(3600)-(24*np.floor(day))
+    
+    xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    xlabels = ['$R_{pl}$ = 0.1 mm', '1 mm', '5 mm', '10 mm']
+    ylabels = [item.get_text() for item in ax.get_yticklabels()]
+    ylabels = ['Surface (z=0)']
+    markers = np.repeat(['o','|','_','s'], len(xlabels)/4)
+    linewidths= [1,3,3,1]
+    sizes = [200, 300, 400, 500]
+    
+    ax.set_xticks(x)
+    ax.set_xticklabels(xlabels, fontsize=20)
+    ax.set_yticks(np.array([0]))
+    ax.set_yticklabels(ylabels, fontsize=20)
+    
+    scat = mscatter(x, z_25[0,:], color=colors_densities, s=sizes, ax=ax)
+    
+    def animate(i):
+        y = z_5[i,:]
+        scat.set_offsets(np.c_[x, y]) 
+        ax.set_title('day '+str(int(np.floor(day[i])))+', hour '+str(int(np.floor(t_5[i]))), fontsize=20)
+    
+    anim = FuncAnimation(fig, animate, interval=100, repeat=True, save_count=len(z_5[:,0])-1)
+    
+    writervideo = animation.FFMpegWriter(fps=100) 
+    anim.save(saveloc+'animation_size.mp4', writer=writervideo)
