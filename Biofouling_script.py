@@ -15,7 +15,7 @@ saveloc = '/Users/sophievanmil/Documents/Climate_Physics/SOAC/Project_Biofouling
 
 # Constants and parameters
 g = 9.81 # [m/s^2]
-nu = 0.00109 # [N s/m^2], viscosity
+nu = 0.00109 # [N s/m^2], dynamic viscosity
 rho_bf = 1388 # [kg/m^3], algae density
 m_A = 0.39/(3600*24) # [/s], mortality rate
 R_20 = 0.1/(3600*24) # [/s], respiration rate
@@ -151,7 +151,7 @@ I_fluc = np.where(I_fluc < 0, 0, I_fluc)
 I = np.matmul(I_fluc.reshape((len(I_fluc),1)),np.exp(epsilon * z).reshape((1,len(z))))
 
 # Algae growth
-T_min  = 0.2                        # Minimum temperatuer for algae growth [degrees Celcius]
+T_min  = 0.2                        # Minimum temperature for algae growth [degrees Celcius]
 T_max  = 33.3                       # Maximum temperature for algae growth [degrees Celcius]
 T_opt  = 26.7                 
 mu_max = 1.85/(3600*24)             # Maximum growth rate algae [per second]
