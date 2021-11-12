@@ -34,12 +34,11 @@ z = np.arange(-D, 1, dz)
 z = np.flip(z)
 
 drag = True
-vary = 'vary_sizes' # vary_shapes or vary_densities or vary_sizes
+vary = 'vary_shapes' # vary_shapes or vary_densities or vary_sizes
 many_densities = False
-many_sizes = True
+many_sizes = False
 
 shapes = 4
-
 
 rho_pl = np.array([50, 500, 950, 1020])
 if vary == 'vary_densities' and many_densities == True:
@@ -254,10 +253,11 @@ if vary == 'vary_shapes' and drag == True:
     #plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
     plt.savefig(saveloc+"shapes_dep.png",bbox_inches='tight')
     plt.show()
+
     
     # Initial results - only sphere of 1 mm, full time
     plt.figure(figsize=(8,6)) 
-    plt.plot(t/(3600*24), z_p[:,0], color = colors_shapes[0], label='Sphere, radius = 1 mm')
+    plt.plot(t/(3600*24), z_p[:,0], color = colors_shapes[0], label='Sphere')
     plt.xlim([0,30])
     # plt.xticks(np.arange(0,54,6))
     plt.xlabel('Time [days]')
@@ -267,7 +267,6 @@ if vary == 'vary_shapes' and drag == True:
     #plt.title('Plastic particle oscillation for various shapes with equal volume, on day 25') #', shape-dependant drag = '+ str(drag)) #', R = '+ str(R) + ' m')
     plt.savefig(saveloc+"sphere_totaltime.png",bbox_inches='tight')
     plt.show()
-    
     
     ## Biofilm volume
     plt.figure(figsize=(8,6))
@@ -282,7 +281,7 @@ if vary == 'vary_shapes' and drag == True:
     plt.savefig(saveloc+"shapes_bf.png",bbox_inches='tight')
     plt.show()
     
-    ## Algae per m^2
+    # Algae per m^2
     plt.figure(figsize=(8,6))
     plt.plot(t/(3600*24), A[:,0], color = colors_shapes[0], label='Sphere')
     plt.plot(t/(3600*24), A[:,1], color = colors_shapes[1], label='Cylinder falling vertically')
@@ -314,8 +313,8 @@ if vary == 'vary_densities':
         
         plt.figure(figsize=(8,6)) 
         plt.plot(t/(3600*24), z_p[:,-1], 'r', label='Density = {} kg/m$^3$'.format(rho_pl[-1]))
-        plt.xlim([0,20])
-        plt.xticks([0, 5, 10, 15, 20])
+        # plt.xlim([0,30])
+        plt.xticks([0, 5, 10, 15, 20, 25, 30])
         plt.xlabel('Time [days]')
         plt.ylabel('Depth [m]')
         plt.legend()
